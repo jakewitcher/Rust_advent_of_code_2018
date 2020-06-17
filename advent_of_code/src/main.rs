@@ -2,6 +2,7 @@ use day_1;
 
 fn main() {
     process_day_1();
+    process_day_2();
 }
 
 fn process_day_1() {
@@ -15,5 +16,13 @@ fn process_day_1() {
         println!("Part 2: Callibration {}", n);
     } else {
         println!("Part 2: Callibration not found");
+    }
+}
+
+fn process_day_2() {
+    if let Some(n) = day_2::part_1::run("./day_2/data/input.txt") {
+        println!("Part 1: Checksum {}", n);
+    } else {
+        println!("Part 1: Checksum not found");
     }
 }

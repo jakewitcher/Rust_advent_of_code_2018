@@ -5,6 +5,7 @@ name = "advent_of_code"
 version = "0.1.0"
 dependencies = [
  "day_1 0.1.0",
+ "day_2 0.1.0",
 ]
 
 [[package]]
