@@ -14,6 +14,20 @@ pub mod part_1 {
     }
 }
 
+pub mod part_2 {
+    use std::fs;
+    use super::compare_ids;
+
+    pub fn run(filename: &str) -> Option<String> {
+        if let Ok(contents) = fs::read_to_string(filename) {
+            let lines = contents.lines().collect();
+            return Some(compare_ids(lines))
+        }
+
+        None
+    }
+}
+
 #[derive(Debug, PartialEq)]
 struct Checksum {
     twice: usize,
@@ -76,6 +90,40 @@ impl Checksum {
     }
 }
 
+fn compare_ids(ids: Vec<&str>) -> String {
+    let mut i = 0;
+
+    for source in &ids {
+        for target in &ids[i..] {
+            if let Some(result) = try_find_matching(target, source) {
+                return result
+            }
+        }
+
+        i += 1;
+    }
+
+    String::new()
+}
+
+fn try_find_matching(left: &str, right: &str) -> Option<String> {
+    let mut common = String::new();
+    let mut variance = 0;
+
+    for (a, b) in left.chars().zip(right.chars()) {
+        if a == b {
+            common.push(a);
+        } else {
+            variance += 1;
+        }
+    }
+
+    match variance {
+        1 => Some(common),
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -119,5 +167,27 @@ mod tests {
         let actual = Checksum::new().calc(test_case);
 
         assert_eq!(12, actual);
+    }
+
+    #[test]
+    fn returns_common_chars_as_string_if_chars_vary_by_one() {
+        let actual = try_find_matching("abc", "adc");
+
+        assert_eq!(Some("ac".to_string()), actual);
+    }
+
+    #[test]
+    fn returns_none_if_chars_vary_by_more_than_one() {
+        let actual = try_find_matching("abc", "ade");
+
+        assert_eq!(None, actual);
+    }
+
+    #[test]
+    fn finds_matching_ids_that_vary_by_one_char() {
+        let test_case = vec!["abcde", "fghij", "klmno", "pqrst", "fguij", "axcye", "wvxyz"];
+        let actual = compare_ids(test_case);
+
+        assert_eq!("fgij".to_string(), actual);
     }
 }

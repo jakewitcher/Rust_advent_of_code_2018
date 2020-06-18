@@ -25,4 +25,10 @@ fn process_day_2() {
     } else {
         println!("Part 1: Checksum not found");
     }
+
+    if let Some(n) = day_2::part_2::run("./day_2/data/input.txt") {
+        println!("Part 2: Matching Id {}", n);
+    } else {
+        println!("Part 2: Matching Id not found");
+    }
 }
