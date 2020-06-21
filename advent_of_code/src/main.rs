@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 fn main() {
     process_day_1();
     process_day_2();
@@ -5,37 +7,30 @@ fn main() {
 }
 
 fn process_day_1() {
-    if let Some(n) = day_1::part_1::run("./day_1/data/input.txt") {
-        println!("Part 1: Frequency {}", n);
-    } else {
-        println!("Part 1: Frequency not found");
-    }
-
-    if let Some(n) = day_1::part_2::run("./day_1/data/input.txt") {
-        println!("Part 2: Callibration {}", n);
-    } else {
-        println!("Part 2: Callibration not found");
-    }
+    println!("Day 1");
+    process_day("Frequency", "./day_1/data/input.txt", day_1::part_1::run);
+    process_day("Callibration", "./day_1/data/input.txt", day_1::part_2::run);
+    println!("");
 }
 
 fn process_day_2() {
-    if let Some(n) = day_2::part_1::run("./day_2/data/input.txt") {
-        println!("Part 1: Checksum {}", n);
-    } else {
-        println!("Part 1: Checksum not found");
-    }
-
-    if let Some(n) = day_2::part_2::run("./day_2/data/input.txt") {
-        println!("Part 2: Matching Id {}", n);
-    } else {
-        println!("Part 2: Matching Id not found");
-    }
+    println!("Day 2");
+    process_day("Checksum", "./day_2/data/input.txt", day_2::part_1::run);
+    process_day("Matching Id", "./day_2/data/input.txt", day_2::part_2::run);
+    println!("");
 }
 
 fn process_day_3() {
-    if let Some(n) = day_3::part_1::run("./day_3/data/input.txt") {
-        println!("Part 1: Overlapping claims {}", n);
-    } else {
-        println!("Part 1: Overlapping claims not found");
+    println!("Day 3");
+    process_day("Overlapping Claims", "./day_3/data/input.txt", day_2::part_1::run);
+    println!("");
+}
+
+fn process_day<T>(label: &str, input: &str, f: fn (&str) -> Option<T>)
+where T: Display
+{
+    match f(input) {
+        Some(val) => println!("{}: {}", label, val),
+        None => println!("{} not found", label)
     }
 }
