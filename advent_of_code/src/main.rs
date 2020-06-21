@@ -1,8 +1,7 @@
-use day_1;
-
 fn main() {
     process_day_1();
     process_day_2();
+    process_day_3();
 }
 
 fn process_day_1() {
@@ -30,5 +29,13 @@ fn process_day_2() {
         println!("Part 2: Matching Id {}", n);
     } else {
         println!("Part 2: Matching Id not found");
+    }
+}
+
+fn process_day_3() {
+    if let Some(n) = day_3::part_1::run("./day_3/data/input.txt") {
+        println!("Part 1: Overlapping claims {}", n);
+    } else {
+        println!("Part 1: Overlapping claims not found");
     }
 }

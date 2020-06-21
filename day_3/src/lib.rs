@@ -1,5 +1,19 @@
 use std::collections::HashMap;
 
+pub mod part_1 {
+    use std::fs;
+    use super::calculate_overlapping_claims;
+
+    pub fn run(filename: &str) -> Option<usize> {
+        if let Ok(contents) = fs::read_to_string(filename) {
+            let lines: Vec<&str> = contents.lines().collect();
+            return Some(calculate_overlapping_claims(lines))
+        }
+    
+        None
+    }
+}
+
 #[derive(Debug, PartialEq)]
 struct Claim {
     id: usize,
