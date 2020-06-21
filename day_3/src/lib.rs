@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 #[derive(Debug, PartialEq)]
 struct Claim {
     id: usize,
@@ -48,14 +50,41 @@ impl Claim {
     pub fn coords(&self) -> Vec<(usize, usize)> {
         let mut results = Vec::new();
 
-        for x in self.x_offset..self.x_offset + self.width - 1 {
-            for y in self.y_offset..self.y_offset + self.height - 1 {
+        for x in self.x_offset..self.x_offset + self.width {
+            for y in self.y_offset..self.y_offset + self.height {
                 results.push((x, y));
             }
         }
 
         results
     }
+}
+
+fn parse_claims(lines: Vec<&str>) -> Vec<Claim> {
+    let results: Vec<Claim> = 
+        lines.into_iter()
+            .filter_map(Claim::new)
+            .collect();
+
+    results
+}
+
+fn calculate_overlapping_claims(lines: Vec<&str>) -> usize {
+    let mut map: HashMap<(usize, usize), usize> = HashMap::new();
+    let claims = parse_claims(lines);
+
+    for claim in claims {
+        for coord in claim.coords() {
+            *map.entry(coord).or_insert(0) += 1;
+        }
+    }
+
+    map.values().fold(0, |state, elem| 
+        if *elem > 1 {
+            state + 1
+        } else {
+            state
+        })
 }
 
 #[cfg(test)]
@@ -98,12 +127,26 @@ mod tests {
     fn returns_list_of_coords_for_claim() {
         let expected = Claim::new("#123 @ 3,2: 5x4").unwrap().coords();
         let actual = vec![
-            (3, 2), (3, 3), (3, 4), 
-            (4, 2), (4, 3), (4, 4), 
-            (5, 2), (5, 3), (5, 4),
-            (6, 2), (6, 3), (6, 4)
+            (3, 2), (3, 3), (3, 4), (3, 5),
+            (4, 2), (4, 3), (4, 4), (4, 5),
+            (5, 2), (5, 3), (5, 4), (5, 5),
+            (6, 2), (6, 3), (6, 4), (6, 5),
+            (7, 2), (7, 3), (7, 4), (7, 5)
         ];
 
         assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn calculates_number_of_overlapping_claims() {
+        let test_case = vec![
+            "#1 @ 1,3: 4x4",
+            "#2 @ 3,1: 4x4",
+            "#3 @ 5,5: 2x2",
+        ];
+
+        let actual = calculate_overlapping_claims(test_case);
+
+        assert_eq!(4, actual);
     }
 }
