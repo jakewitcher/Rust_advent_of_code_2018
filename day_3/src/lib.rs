@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 pub mod part_1 {
     use std::fs;
@@ -8,6 +8,20 @@ pub mod part_1 {
         if let Ok(contents) = fs::read_to_string(filename) {
             let lines: Vec<&str> = contents.lines().collect();
             return Some(calculate_overlapping_claims(lines))
+        }
+    
+        None
+    }
+}
+
+pub mod part_2 {
+    use std::fs;
+    use super::find_unique_claim;
+
+    pub fn run(filename: &str) -> Option<usize> {
+        if let Ok(contents) = fs::read_to_string(filename) {
+            let lines: Vec<&str> = contents.lines().collect();
+            return find_unique_claim(lines)
         }
     
         None
@@ -24,7 +38,7 @@ struct Claim {
 }
 
 impl Claim {
-    pub fn new(line: &str) -> Option<Claim> {
+    fn new(line: &str) -> Option<Claim> {
         let parts: Vec<&str> = line.split_whitespace().collect();
         let id = Claim::parse_id(parts[0]);
         let offset = Claim::parse_offset(parts[2]);
@@ -61,12 +75,12 @@ impl Claim {
         None
     }
 
-    pub fn coords(&self) -> Vec<(usize, usize)> {
-        let mut results = Vec::new();
+    fn coords(&self) -> HashSet<(usize, usize)> {
+        let mut results = HashSet::new();
 
         for x in self.x_offset..self.x_offset + self.width {
             for y in self.y_offset..self.y_offset + self.height {
-                results.push((x, y));
+                results.insert((x, y));
             }
         }
 
@@ -81,6 +95,33 @@ fn parse_claims(lines: Vec<&str>) -> Vec<Claim> {
             .collect();
 
     results
+}
+
+fn find_unique_claim(lines: Vec<&str>) -> Option<usize> {
+    let mut map: HashMap<(usize, usize), usize> = HashMap::new();
+    let claims = parse_claims(lines);
+
+    for claim in &claims {
+        for coord in claim.coords() {
+            *map.entry(coord).or_insert(0) += 1;
+        }
+    }
+
+    let mut unique_coords = HashSet::new();
+
+    for key in map.keys() {
+        if map[key] == 1 {
+            unique_coords.insert(*key);
+        }
+    }
+
+    for claim in &claims {
+        if claim.coords().is_subset(&unique_coords) {
+            return Some(claim.id)
+        }
+    }
+
+    None
 }
 
 fn calculate_overlapping_claims(lines: Vec<&str>) -> usize {
@@ -140,13 +181,18 @@ mod tests {
     #[test]
     fn returns_list_of_coords_for_claim() {
         let expected = Claim::new("#123 @ 3,2: 5x4").unwrap().coords();
-        let actual = vec![
+        let coords = vec![
             (3, 2), (3, 3), (3, 4), (3, 5),
             (4, 2), (4, 3), (4, 4), (4, 5),
             (5, 2), (5, 3), (5, 4), (5, 5),
             (6, 2), (6, 3), (6, 4), (6, 5),
             (7, 2), (7, 3), (7, 4), (7, 5)
         ];
+
+        let mut actual = HashSet::new();
+        for coord in coords {
+            actual.insert(coord);
+        }
 
         assert_eq!(expected, actual);
     }
@@ -162,5 +208,18 @@ mod tests {
         let actual = calculate_overlapping_claims(test_case);
 
         assert_eq!(4, actual);
+    }
+
+    #[test]
+    fn finds_id_of_unique_claim() {
+        let test_case = vec![
+            "#1 @ 1,3: 4x4",
+            "#2 @ 3,1: 4x4",
+            "#3 @ 5,5: 2x2",
+        ];
+
+        let actual = find_unique_claim(test_case);
+
+        assert_eq!(Some(3), actual);
     }
 }

@@ -23,6 +23,7 @@ fn process_day_2() {
 fn process_day_3() {
     println!("Day 3");
     process_day("Overlapping Claims", "./day_3/data/input.txt", day_2::part_1::run);
+    process_day("Unique Claim", "./day_3/data/input.txt", day_2::part_2::run);
     println!("");
 }
 
